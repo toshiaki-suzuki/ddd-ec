@@ -1,3 +1,5 @@
+import { InvalidMoneyError } from './errors/invalidMoneyError';
+
 export class Money {
   private constructor(
     public readonly amount: number,
@@ -5,8 +7,12 @@ export class Money {
   ) { }
 
   static createJpy(amount: number): Money {
-    if (amount < 0) throw new Error('Money amount cannot be negative');
-    if (!Number.isInteger(amount)) throw new Error('Money amount must be an integer');
+    if (amount < 0) {
+      throw new InvalidMoneyError('AMOUNT_NEGATIVE', 'Money amount cannot be negative');
+    }
+    if (!Number.isInteger(amount)) {
+      throw new InvalidMoneyError('AMOUNT_NOT_INTEGER', 'Money amount must be an integer');
+    }
     return new Money(amount, 'JPY');
   }
 
@@ -30,7 +36,7 @@ export class Money {
 
   private assertSameCurrency(other: Money): void {
     if (this.currency !== other.currency) {
-      throw new Error('Currency mismatch');
+      throw new InvalidMoneyError('CURRENCY_MISMATCH', 'Currency mismatch');
     }
   }
 }

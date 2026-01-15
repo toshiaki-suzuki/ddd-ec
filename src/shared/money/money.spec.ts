@@ -1,4 +1,5 @@
 import { Money } from './money';
+import { InvalidMoneyError } from './errors/invalidMoneyError';
 
 describe('Money', () => {
     describe('createJpy', () => {
@@ -9,11 +10,23 @@ describe('Money', () => {
         });
 
         it('負の金額の場合はエラーをスローする', () => {
-            expect(() => Money.createJpy(-100)).toThrow('Money amount cannot be negative');
+            expect(() => Money.createJpy(-100)).toThrow(InvalidMoneyError);
+            try {
+                Money.createJpy(-100);
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidMoneyError);
+                expect((error as InvalidMoneyError).code).toBe('AMOUNT_NEGATIVE');
+            }
         });
 
         it('整数でない金額の場合はエラーをスローする', () => {
-            expect(() => Money.createJpy(100.5)).toThrow('Money amount must be an integer');
+            expect(() => Money.createJpy(100.5)).toThrow(InvalidMoneyError);
+            try {
+                Money.createJpy(100.5);
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidMoneyError);
+                expect((error as InvalidMoneyError).code).toBe('AMOUNT_NOT_INTEGER');
+            }
         });
 
         it('ゼロを受け入れる', () => {
