@@ -1,7 +1,8 @@
 export type MoneyErrorCode =
     | 'AMOUNT_NEGATIVE'
     | 'AMOUNT_NOT_INTEGER'
-    | 'CURRENCY_MISMATCH';
+    | 'CURRENCY_MISMATCH'
+    | 'SUBTRACTION_RESULT_NEGATIVE';
 
 export class InvalidMoneyError extends Error {
     readonly code: MoneyErrorCode;

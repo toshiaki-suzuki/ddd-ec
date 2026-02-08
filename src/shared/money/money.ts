@@ -23,7 +23,14 @@ export class Money {
 
   subtract(other: Money): Money {
     this.assertSameCurrency(other);
-    return new Money(this.amount - other.amount, this.currency);
+    const resultAmount = this.amount - other.amount;
+    if (resultAmount < 0) {
+      throw new InvalidMoneyError(
+        'SUBTRACTION_RESULT_NEGATIVE',
+        'Resulting money amount cannot be negative',
+      );
+    }
+    return new Money(resultAmount, this.currency);
   }
 
   isZero(): boolean {

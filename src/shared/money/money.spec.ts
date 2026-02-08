@@ -71,11 +71,14 @@ describe('Money', () => {
             expect(result.amount).toBe(700);
         });
 
-        it('負の結果を許容する', () => {
+        it('負の結果になる場合はエラーをスローする', () => {
             const money1 = Money.createJpy(500);
             const money2 = Money.createJpy(1000);
-            const result = money1.subtract(money2);
-            expect(result.amount).toBe(-500);
+            expectInvalidMoneyError(
+                () => money1.subtract(money2),
+                'SUBTRACTION_RESULT_NEGATIVE',
+                'Resulting money amount cannot be negative',
+            );
         });
     });
 
