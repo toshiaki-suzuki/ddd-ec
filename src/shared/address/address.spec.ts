@@ -83,12 +83,40 @@ describe('Address', () => {
             );
         });
 
+        it('郵便番号が空の場合InvalidAddressErrorをスローすること', () => {
+            expectInvalidAddressError(
+                () =>
+                    Address.create({
+                        postalCode: '   ',
+                        prefecture: '東京都',
+                        city: '千代田区',
+                        line1: '千代田1-1',
+                    }),
+                'POSTAL_CODE_REQUIRED',
+                'Postal code is required',
+            );
+        });
+
         it('都道府県が空の場合InvalidAddressErrorをスローすること', () => {
             expectInvalidAddressError(
                 () =>
                     Address.create({
                         postalCode: '100-0001',
                         prefecture: '',
+                        city: '千代田区',
+                        line1: '千代田1-1',
+                    }),
+                'PREFECTURE_REQUIRED',
+                'Prefecture is required',
+            );
+        });
+
+        it('都道府県が空白のみの場合InvalidAddressErrorをスローすること', () => {
+            expectInvalidAddressError(
+                () =>
+                    Address.create({
+                        postalCode: '100-0001',
+                        prefecture: '   ',
                         city: '千代田区',
                         line1: '千代田1-1',
                     }),
@@ -111,6 +139,20 @@ describe('Address', () => {
             );
         });
 
+        it('市区町村が空白のみの場合InvalidAddressErrorをスローすること', () => {
+            expectInvalidAddressError(
+                () =>
+                    Address.create({
+                        postalCode: '100-0001',
+                        prefecture: '東京都',
+                        city: '   ',
+                        line1: '千代田1-1',
+                    }),
+                'CITY_REQUIRED',
+                'City is required',
+            );
+        });
+
         it('番地が空の場合InvalidAddressErrorをスローすること', () => {
             expectInvalidAddressError(
                 () =>
@@ -119,6 +161,20 @@ describe('Address', () => {
                         prefecture: '東京都',
                         city: '千代田区',
                         line1: '',
+                    }),
+                'LINE1_REQUIRED',
+                'Line1 is required',
+            );
+        });
+
+        it('番地が空白のみの場合InvalidAddressErrorをスローすること', () => {
+            expectInvalidAddressError(
+                () =>
+                    Address.create({
+                        postalCode: '100-0001',
+                        prefecture: '東京都',
+                        city: '千代田区',
+                        line1: '   ',
                     }),
                 'LINE1_REQUIRED',
                 'Line1 is required',
