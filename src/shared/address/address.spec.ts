@@ -1,6 +1,22 @@
 import { Address } from './address';
 import { InvalidAddressError } from './errors/invalidAddressError';
 
+const expectInvalidAddressError = (
+    action: () => void,
+    code: InvalidAddressError['code'],
+    message: string,
+): void => {
+    try {
+        action();
+        fail('Expected InvalidAddressError to be thrown');
+    } catch (error) {
+        expect(error).toBeInstanceOf(InvalidAddressError);
+        const domainError = error as InvalidAddressError;
+        expect(domainError.code).toBe(code);
+        expect(domainError.message).toBe(message);
+    }
+};
+
 describe('Address', () => {
     describe('create', () => {
         it('正常な値でAddressを作成できること', () => {
@@ -54,79 +70,59 @@ describe('Address', () => {
         });
 
         it('不正な郵便番号フォーマットの場合InvalidAddressErrorをスローすること', () => {
-            expect(() =>
-                Address.create({
-                    postalCode: '12345',
-                    prefecture: '東京都',
-                    city: '千代田区',
-                    line1: '千代田1-1',
-                }),
-            ).toThrow(InvalidAddressError);
-            expect(() =>
-                Address.create({
-                    postalCode: '12345',
-                    prefecture: '東京都',
-                    city: '千代田区',
-                    line1: '千代田1-1',
-                }),
-            ).toThrow('Postal code is invalid');
+            expectInvalidAddressError(
+                () =>
+                    Address.create({
+                        postalCode: '12345',
+                        prefecture: '東京都',
+                        city: '千代田区',
+                        line1: '千代田1-1',
+                    }),
+                'POSTAL_CODE_INVALID',
+                'Postal code is invalid',
+            );
         });
 
         it('都道府県が空の場合InvalidAddressErrorをスローすること', () => {
-            expect(() =>
-                Address.create({
-                    postalCode: '100-0001',
-                    prefecture: '',
-                    city: '千代田区',
-                    line1: '千代田1-1',
-                }),
-            ).toThrow(InvalidAddressError);
-            expect(() =>
-                Address.create({
-                    postalCode: '100-0001',
-                    prefecture: '',
-                    city: '千代田区',
-                    line1: '千代田1-1',
-                }),
-            ).toThrow('Prefecture is required');
+            expectInvalidAddressError(
+                () =>
+                    Address.create({
+                        postalCode: '100-0001',
+                        prefecture: '',
+                        city: '千代田区',
+                        line1: '千代田1-1',
+                    }),
+                'PREFECTURE_REQUIRED',
+                'Prefecture is required',
+            );
         });
 
         it('市区町村が空の場合InvalidAddressErrorをスローすること', () => {
-            expect(() =>
-                Address.create({
-                    postalCode: '100-0001',
-                    prefecture: '東京都',
-                    city: '',
-                    line1: '千代田1-1',
-                }),
-            ).toThrow(InvalidAddressError);
-            expect(() =>
-                Address.create({
-                    postalCode: '100-0001',
-                    prefecture: '東京都',
-                    city: '',
-                    line1: '千代田1-1',
-                }),
-            ).toThrow('City is required');
+            expectInvalidAddressError(
+                () =>
+                    Address.create({
+                        postalCode: '100-0001',
+                        prefecture: '東京都',
+                        city: '',
+                        line1: '千代田1-1',
+                    }),
+                'CITY_REQUIRED',
+                'City is required',
+            );
         });
 
         it('番地が空の場合InvalidAddressErrorをスローすること', () => {
-            expect(() =>
-                Address.create({
-                    postalCode: '100-0001',
-                    prefecture: '東京都',
-                    city: '千代田区',
-                    line1: '',
-                }),
-            ).toThrow(InvalidAddressError);
-            expect(() =>
-                Address.create({
-                    postalCode: '100-0001',
-                    prefecture: '東京都',
-                    city: '千代田区',
-                    line1: '',
-                }),
-            ).toThrow('Line1 is required');
+            expectInvalidAddressError(
+                () =>
+                    Address.create({
+                        postalCode: '100-0001',
+                        prefecture: '東京都',
+                        city: '千代田区',
+                        line1: '',
+                    }),
+                'LINE1_REQUIRED',
+                'Line1 is required',
+            );
         });
     });
 

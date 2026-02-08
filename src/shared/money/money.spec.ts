@@ -1,6 +1,22 @@
 import { Money } from './money';
 import { InvalidMoneyError } from './errors/invalidMoneyError';
 
+const expectInvalidMoneyError = (
+    action: () => void,
+    code: InvalidMoneyError['code'],
+    message: string,
+): void => {
+    try {
+        action();
+        fail('Expected InvalidMoneyError to be thrown');
+    } catch (error) {
+        expect(error).toBeInstanceOf(InvalidMoneyError);
+        const domainError = error as InvalidMoneyError;
+        expect(domainError.code).toBe(code);
+        expect(domainError.message).toBe(message);
+    }
+};
+
 describe('Money', () => {
     describe('createJpy', () => {
         it('有効な金額でMoneyを作成できる', () => {
@@ -10,23 +26,19 @@ describe('Money', () => {
         });
 
         it('負の金額の場合はエラーをスローする', () => {
-            expect(() => Money.createJpy(-100)).toThrow(InvalidMoneyError);
-            try {
-                Money.createJpy(-100);
-            } catch (error) {
-                expect(error).toBeInstanceOf(InvalidMoneyError);
-                expect((error as InvalidMoneyError).code).toBe('AMOUNT_NEGATIVE');
-            }
+            expectInvalidMoneyError(
+                () => Money.createJpy(-100),
+                'AMOUNT_NEGATIVE',
+                'Money amount cannot be negative',
+            );
         });
 
         it('整数でない金額の場合はエラーをスローする', () => {
-            expect(() => Money.createJpy(100.5)).toThrow(InvalidMoneyError);
-            try {
-                Money.createJpy(100.5);
-            } catch (error) {
-                expect(error).toBeInstanceOf(InvalidMoneyError);
-                expect((error as InvalidMoneyError).code).toBe('AMOUNT_NOT_INTEGER');
-            }
+            expectInvalidMoneyError(
+                () => Money.createJpy(100.5),
+                'AMOUNT_NOT_INTEGER',
+                'Money amount must be an integer',
+            );
         });
 
         it('ゼロを受け入れる', () => {

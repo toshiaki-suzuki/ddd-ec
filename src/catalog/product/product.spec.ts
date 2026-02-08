@@ -2,6 +2,22 @@ import { Money } from '../../shared/money/money';
 import { InvalidProductError } from './errors/invalidProductError';
 import { Product } from './product';
 
+const expectInvalidProductError = (
+  action: () => void,
+  code: string,
+  message: string,
+): void => {
+  try {
+    action();
+    fail('Expected InvalidProductError to be thrown');
+  } catch (error) {
+    expect(error).toBeInstanceOf(InvalidProductError);
+    const domainError = error as InvalidProductError;
+    expect(domainError.code).toBe(code);
+    expect(domainError.message).toBe(message);
+  }
+};
+
 describe('Product', () => {
   describe('create', () => {
     it('正常な値でProductを作成できること', () => {
@@ -19,41 +35,31 @@ describe('Product', () => {
     });
 
     it('productIdが空の場合はエラーをスローすること', () => {
-      expect(() =>
-        Product.create({
-          productId: '   ',
-          name: 'Keyboard',
-          price: Money.createJpy(9800),
-          status: 'Active',
-        }),
-      ).toThrow(InvalidProductError);
-      expect(() =>
-        Product.create({
-          productId: '   ',
-          name: 'Keyboard',
-          price: Money.createJpy(9800),
-          status: 'Active',
-        }),
-      ).toThrow('Product id is required');
+      expectInvalidProductError(
+        () =>
+          Product.create({
+            productId: '   ',
+            name: 'Keyboard',
+            price: Money.createJpy(9800),
+            status: 'Active',
+          }),
+        'PRODUCT_ID_REQUIRED',
+        'Product id is required',
+      );
     });
 
     it('nameが空の場合はエラーをスローすること', () => {
-      expect(() =>
-        Product.create({
-          productId: 'P-001',
-          name: '   ',
-          price: Money.createJpy(9800),
-          status: 'Active',
-        }),
-      ).toThrow(InvalidProductError);
-      expect(() =>
-        Product.create({
-          productId: 'P-001',
-          name: '   ',
-          price: Money.createJpy(9800),
-          status: 'Active',
-        }),
-      ).toThrow('Product name is required');
+      expectInvalidProductError(
+        () =>
+          Product.create({
+            productId: 'P-001',
+            name: '   ',
+            price: Money.createJpy(9800),
+            status: 'Active',
+          }),
+        'NAME_REQUIRED',
+        'Product name is required',
+      );
     });
   });
 

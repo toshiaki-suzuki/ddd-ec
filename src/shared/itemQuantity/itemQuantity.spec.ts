@@ -1,6 +1,22 @@
 import { ItemQuantity } from './itemQuantity';
 import { InvalidItemQuantityError } from './errors/invalidItemQuantityError';
 
+const expectInvalidItemQuantityError = (
+    action: () => void,
+    code: InvalidItemQuantityError['code'],
+    message: string,
+): void => {
+    try {
+        action();
+        fail('Expected InvalidItemQuantityError to be thrown');
+    } catch (error) {
+        expect(error).toBeInstanceOf(InvalidItemQuantityError);
+        const domainError = error as InvalidItemQuantityError;
+        expect(domainError.code).toBe(code);
+        expect(domainError.message).toBe(message);
+    }
+};
+
 describe('ItemQuantity', () => {
     describe('of', () => {
         it('有効な値でItemQuantityを作成できる', () => {
@@ -9,33 +25,27 @@ describe('ItemQuantity', () => {
         });
 
         it('1未満の値の場合はエラーをスローする', () => {
-            expect(() => ItemQuantity.of(0)).toThrow(InvalidItemQuantityError);
-            try {
-                ItemQuantity.of(0);
-            } catch (error) {
-                expect(error).toBeInstanceOf(InvalidItemQuantityError);
-                expect((error as InvalidItemQuantityError).code).toBe('VALUE_OUT_OF_RANGE');
-            }
+            expectInvalidItemQuantityError(
+                () => ItemQuantity.of(0),
+                'VALUE_OUT_OF_RANGE',
+                'ItemQuantity must be between 1 and 99',
+            );
         });
 
         it('99を超える値の場合はエラーをスローする', () => {
-            expect(() => ItemQuantity.of(100)).toThrow(InvalidItemQuantityError);
-            try {
-                ItemQuantity.of(100);
-            } catch (error) {
-                expect(error).toBeInstanceOf(InvalidItemQuantityError);
-                expect((error as InvalidItemQuantityError).code).toBe('VALUE_OUT_OF_RANGE');
-            }
+            expectInvalidItemQuantityError(
+                () => ItemQuantity.of(100),
+                'VALUE_OUT_OF_RANGE',
+                'ItemQuantity must be between 1 and 99',
+            );
         });
 
         it('整数でない値の場合はエラーをスローする', () => {
-            expect(() => ItemQuantity.of(10.5)).toThrow(InvalidItemQuantityError);
-            try {
-                ItemQuantity.of(10.5);
-            } catch (error) {
-                expect(error).toBeInstanceOf(InvalidItemQuantityError);
-                expect((error as InvalidItemQuantityError).code).toBe('VALUE_NOT_INTEGER');
-            }
+            expectInvalidItemQuantityError(
+                () => ItemQuantity.of(10.5),
+                'VALUE_NOT_INTEGER',
+                'ItemQuantity must be an integer',
+            );
         });
 
         it('境界値を受け入れる', () => {
@@ -55,13 +65,11 @@ describe('ItemQuantity', () => {
 
         it('最大値を超える場合はエラーをスローする', () => {
             const quantity = ItemQuantity.of(99);
-            expect(() => quantity.increment()).toThrow(InvalidItemQuantityError);
-            try {
-                quantity.increment();
-            } catch (error) {
-                expect(error).toBeInstanceOf(InvalidItemQuantityError);
-                expect((error as InvalidItemQuantityError).code).toBe('VALUE_OUT_OF_RANGE');
-            }
+            expectInvalidItemQuantityError(
+                () => quantity.increment(),
+                'VALUE_OUT_OF_RANGE',
+                'ItemQuantity must be between 1 and 99',
+            );
         });
     });
 
@@ -74,13 +82,11 @@ describe('ItemQuantity', () => {
 
         it('最小値を下回る場合はエラーをスローする', () => {
             const quantity = ItemQuantity.of(1);
-            expect(() => quantity.decrement()).toThrow(InvalidItemQuantityError);
-            try {
-                quantity.decrement();
-            } catch (error) {
-                expect(error).toBeInstanceOf(InvalidItemQuantityError);
-                expect((error as InvalidItemQuantityError).code).toBe('VALUE_OUT_OF_RANGE');
-            }
+            expectInvalidItemQuantityError(
+                () => quantity.decrement(),
+                'VALUE_OUT_OF_RANGE',
+                'ItemQuantity must be between 1 and 99',
+            );
         });
     });
 
@@ -99,24 +105,20 @@ describe('ItemQuantity', () => {
 
         it('整数でない値の場合はエラーをスローする', () => {
             const quantity = ItemQuantity.of(10);
-            expect(() => quantity.add(2.5)).toThrow(InvalidItemQuantityError);
-            try {
-                quantity.add(2.5);
-            } catch (error) {
-                expect(error).toBeInstanceOf(InvalidItemQuantityError);
-                expect((error as InvalidItemQuantityError).code).toBe('ADDEND_NOT_INTEGER');
-            }
+            expectInvalidItemQuantityError(
+                () => quantity.add(2.5),
+                'ADDEND_NOT_INTEGER',
+                'Addend must be an integer',
+            );
         });
 
         it('範囲を超える場合はエラーをスローする', () => {
             const quantity = ItemQuantity.of(50);
-            expect(() => quantity.add(50)).toThrow(InvalidItemQuantityError);
-            try {
-                quantity.add(50);
-            } catch (error) {
-                expect(error).toBeInstanceOf(InvalidItemQuantityError);
-                expect((error as InvalidItemQuantityError).code).toBe('VALUE_OUT_OF_RANGE');
-            }
+            expectInvalidItemQuantityError(
+                () => quantity.add(50),
+                'VALUE_OUT_OF_RANGE',
+                'ItemQuantity must be between 1 and 99',
+            );
         });
     });
 
